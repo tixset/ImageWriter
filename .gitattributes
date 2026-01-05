@@ -1,0 +1,43 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Delphi source files - CRLF (Windows)
+*.pas text eol=crlf
+*.dpr text eol=crlf
+*.dfm text eol=crlf
+*.dpk text eol=crlf
+*.dproj text eol=crlf
+*.groupproj text eol=crlf
+*.inc text eol=crlf
+
+# Config files
+*.cfg text eol=crlf
+*.ini text eol=crlf
+*.bat text eol=crlf
+
+# Documentation - LF for cross-platform
+*.md text eol=lf
+*.txt text eol=lf
+
+# Scripts
+*.ps1 text eol=crlf
+*.sh text eol=lf
+
+# Binary files
+*.exe binary
+*.dll binary
+*.res binary
+*.RES binary
+*.dcu binary
+*.bmp binary
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+
+# Archive diff
+*.zip diff=zip
+*.7z binary
+*.rar binary
+*.gz binary

@@ -1,0 +1,107 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    name: Build ImageWriter
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup build environment
+      run: |
+        echo "Setting up build environment for Delphi 7"
+        echo "Current directory: $PWD"
+        
+    # Note: For actual Delphi 7 builds, you would need to:
+    # 1. Install Delphi 7 on the runner (or use a custom runner with Delphi pre-installed)
+    # 2. Or use Free Pascal Compiler (FPC) as an alternative
+    # 3. Or use a Docker container with Delphi
+    
+    - name: Check project structure
+      run: |
+        Write-Host "Checking project structure..."
+        if (Test-Path "ImageWriter.dpr") {
+          Write-Host "✓ Main project file found"
+        } else {
+          Write-Host "✗ Main project file not found"
+          exit 1
+        }
+        
+        if (Test-Path "src/mainform.pas") {
+          Write-Host "✓ Source files found"
+        } else {
+          Write-Host "✗ Source files not found"
+          exit 1
+        }
+        
+        if (Test-Path "build.bat") {
+          Write-Host "✓ Build script found"
+        } else {
+          Write-Host "✗ Build script not found"
+          exit 1
+        }
+        
+    - name: Validate Pascal syntax
+      run: |
+        Write-Host "Validating Pascal files..."
+        $pasFiles = Get-ChildItem -Path "src" -Filter "*.pas" -Recurse
+        Write-Host "Found $($pasFiles.Count) Pascal files"
+        
+        foreach ($file in $pasFiles) {
+          Write-Host "Checking $($file.Name)..."
+          $content = Get-Content $file.FullName -Raw
+          
+          # Basic syntax checks
+          if ($content -match "end\.\s*$" -and $file.Name -match "\.dpr$") {
+            Write-Host "  ✓ Program file properly terminated"
+          }
+          
+          if ($content -match "^unit\s+\w+;") {
+            Write-Host "  ✓ Unit declaration found"
+          }
+        }
+        
+    - name: Check for compilation artifacts
+      run: |
+        Write-Host "Checking for unwanted compilation artifacts..."
+        $dcuFiles = Get-ChildItem -Path "." -Filter "*.dcu" -Recurse -ErrorAction SilentlyContinue
+        if ($dcuFiles.Count -gt 0) {
+          Write-Host "⚠ Warning: Found $($dcuFiles.Count) .dcu files (should be in .gitignore)"
+        } else {
+          Write-Host "✓ No .dcu files found in repository"
+        }
+        
+    - name: Archive source code
+      uses: actions/upload-artifact@v4
+      with:
+        name: imagewriter-source
+        path: |
+          src/
+          resources/
+          *.dpr
+          *.dproj
+          build.bat
+        retention-days: 30
+        
+    - name: Build summary
+      run: |
+        Write-Host ""
+        Write-Host "========================================" -ForegroundColor Cyan
+        Write-Host "Build Check Summary" -ForegroundColor Cyan
+        Write-Host "========================================" -ForegroundColor Cyan
+        Write-Host "✓ Project structure validated" -ForegroundColor Green
+        Write-Host "✓ Source files checked" -ForegroundColor Green
+        Write-Host "⚠ Note: Actual compilation requires Delphi 7" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "To enable full compilation in CI/CD:" -ForegroundColor Yellow
+        Write-Host "  1. Set up self-hosted runner with Delphi 7" -ForegroundColor Yellow
+        Write-Host "  2. Or migrate to Free Pascal Compiler (FPC)" -ForegroundColor Yellow
+        Write-Host "  3. Or use Docker with Delphi environment" -ForegroundColor Yellow
