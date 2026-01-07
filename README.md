@@ -256,7 +256,8 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ## 📞 Contact
 
-- **Author:** Anton Zelenov (tixset@gmail.com)
+- **Author:** Anton Zelenov
+- **Email:** tixset@gmail.com
 - **GitHub:** https://github.com/tixset/ImageWriter
 - **Original dd for Windows:** John Newbigin (jn@chrysocome.net)
 
